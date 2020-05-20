@@ -11,7 +11,7 @@ import numpy as np
 import progressbar
 
 # load data
-data = pd.read_csv("../Data/ucdp_views_priogrid_month/ucdp_month_priogrid.csv")
+data = pd.read_csv("./data/ucdp_month_priogrid.csv")
 
 #%%
 def retrieve_coord(pg_id):
@@ -128,6 +128,6 @@ for i in range(0,npg_id):
         
     pb.update(i+npg_id)
 #%%
-#np.save('sb_best_neighbors_mat',sb_best_neighbors_mat)
-#np.save('coords',coords)
+np.save('./data/sb_best_neighbors_mat',sb_best_neighbors_mat)
+np.save('./data/coords',coords)
 
