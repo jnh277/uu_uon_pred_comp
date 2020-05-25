@@ -33,8 +33,13 @@ parameters {
 }
 transformed parameters{
     // the probability of z = 1
-    row_vector<lower=0,upper=1>[no_obs+1] lambda;
-    lambda = inv_logit(beta * (exp(exp(s-1) - 1)-1));
+    row_vector<lower=0>[no_obs+1] lambda;
+//    lambda = inv_logit(beta * (exp(exp(s-1) - 1)-1));
+    lambda = log(1+exp(s));
+//    for (i in 1:(no_obs+1)){
+//        lambda[i] = fmax(s[i],0.0);
+//    }
+//    lambda =
 }
 model {
 
@@ -60,24 +65,26 @@ model {
     x[2:no_obs+1] ~ normal(a*x[1:no_obs]+c*u, sqrt((1-a*a)*(1-sig_e*sig_e)));
     s[2:no_obs+1] ~ normal(b*s[1:no_obs]+d*u, sqrt(1-b*b));
 
+
+    y_lin ~ normal(x[2:no_obs+1] .* lambda[2:no_obs+1], sig_e);
     // if yt > 0, then likelihood is just scaled down
     // measurement model
-    for (n in 1:no_obs){ // see https://mc-stan.org/docs/2_20/stan-users-guide/vectorizing-mixtures.html for why cant vectorise
-
-        if (y[n] > 0){
-            // lambda was the probabilty that z = 1
-            target += log(lambda[n+1]) + normal_lpdf(y_lin[n] | x[n+1], sig_e);
-            // + (1-lambda) * 0 percent probability that it came from z = 1
-
-        }
-        else{
-            target += log_mix(lambda[n+1],
-                            normal_lcdf( log(1.5)/alpha | x[n+1], sig_e),
-                            0.0);     // second part is ln(1)=0
-        }
-
-
-    }
+//    for (n in 1:no_obs){ // see https://mc-stan.org/docs/2_20/stan-users-guide/vectorizing-mixtures.html for why cant vectorise
+//
+//        if (y[n] > 0){
+//            // lambda was the probabilty that z = 1
+//            target += log(lambda[n+1]) + normal_lpdf(y_lin[n] | x[n+1], sig_e);
+//            // + (1-lambda) * 0 percent probability that it came from z = 1
+//
+//        }
+//        else{
+//            target += log_mix(lambda[n+1],
+//                            normal_lcdf( log(1.5)/alpha | x[n+1], sig_e),
+//                            0.0);     // second part is ln(1)=0
+//        }
+//
+//
+//    }
 
 }
 generated quantities {

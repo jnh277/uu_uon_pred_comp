@@ -19,11 +19,11 @@ parameters {
 //    real<lower=0,upper=1> b;        // coefficient for the s state
 //    real<lower=0> beta;             // part of the latent discrete state distribution
 //    real<lower=0> alpha;            // part of the measurement model
-    row_vector[max_poly*num_inputs] c;     // polynomial coefficients for u acting on x
-    row_vector[max_poly*num_inputs] d;     // polynomial coefficients for u acting on s
-    row_vector<lower=0>[max_poly*num_inputs] c_hyper;    // hyper priors for c
-    row_vector<lower=0>[max_poly*num_inputs] d_hyper;    // hyper priors for d
-    real<lower=0> shrinkage_param;
+//    row_vector[max_poly*num_inputs] c;     // polynomial coefficients for u acting on x
+//    row_vector[max_poly*num_inputs] d;     // polynomial coefficients for u acting on s
+//    row_vector<lower=0>[max_poly*num_inputs] c_hyper;    // hyper priors for c
+//    row_vector<lower=0>[max_poly*num_inputs] d_hyper;    // hyper priors for d
+//    real<lower=0> shrinkage_param;
 
     real<lower=0,upper=1> sig_e;            // noise standard deviation
 
@@ -40,13 +40,13 @@ model {
 
 
     // hyper priors
-    shrinkage_param ~ cauchy(0.0, 1.0);
-    c_hyper ~ cauchy(0.0, 1.0);
-    d_hyper ~ cauchy(0.0, 1.0);
+//    shrinkage_param ~ cauchy(0.0, 1.0);
+//    c_hyper ~ cauchy(0.0, 1.0);
+//    d_hyper ~ cauchy(0.0, 1.0);
 
-    // parameters
-    c ~ normal(0.0, c_hyper * shrinkage_param);
-    d ~ normal(0.0, d_hyper * shrinkage_param);
+//    // parameters
+//    c ~ normal(0.0, c_hyper * shrinkage_param);
+//    d ~ normal(0.0, d_hyper * shrinkage_param);
 
     // noise standard deviation
     sig_e ~ cauchy(0.0, 1.0);
@@ -57,8 +57,8 @@ model {
     s[1] ~ normal(0, 1);
 
     // state transition model
-    x[2:no_obs+1] ~ normal(a*x[1:no_obs]+c*u, sqrt((1-a*a)*(1-sig_e*sig_e)));
-    s[2:no_obs+1] ~ normal(b*s[1:no_obs]+d*u, sqrt(1-b*b));
+    x[2:no_obs+1] ~ normal(a*x[1:no_obs], sqrt((1-a*a)*(1-sig_e*sig_e)));
+    s[2:no_obs+1] ~ normal(b*s[1:no_obs], sqrt(1-b*b));
 
     // if yt > 0, then likelihood is just scaled down
     // measurement model
@@ -81,8 +81,8 @@ model {
 
 }
 generated quantities {
-    row_vector[no_obs] x_p1 = a*x[1:no_obs]+c*u;
-    row_vector[no_obs] s_p1 = b*s[1:no_obs]+d*u;
+    row_vector[no_obs] x_p1 = a*x[1:no_obs];
+    row_vector[no_obs] s_p1 = b*s[1:no_obs];
     row_vector[no_obs] lambda_p1 = inv_logit(beta * (exp(exp(s_p1-1) - 1))-1);
 
 
